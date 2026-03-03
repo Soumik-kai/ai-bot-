@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "src/main.rs", "use": "@vercel/rust" }
+  ],
+  "routes": [
+    { "src": "/webhook", "dest": "/src/main.rs" }
+  ]
+}
