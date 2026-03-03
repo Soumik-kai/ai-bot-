@@ -1,0 +1,21 @@
+[package]
+name = "tg-ai-bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.35", features = ["macros", "rt-multi-thread"] }
+axum = { version = "0.7", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "gzip", "stream", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "macros"] }
+redis = { version = "0.23", features = ["tokio-comp"] }
+anyhow = "1.0"
+async-trait = "0.1"
+tracing = "0.2"
+tracing-subscriber = "0.3"
+uuid = { version = "1", features = ["v4"] }
+dotenv = "0.15"
+base64 = "0.21"
+multipart = "0.18"
