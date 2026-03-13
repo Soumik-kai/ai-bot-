@@ -4,6 +4,6 @@
     { "src": "src/main.rs", "use": "@vercel/rust" }
   ],
   "routes": [
-    { "src": "/webhook", "dest": "/src/main.rs" }
+    { "src": "/.*", "dest": "/src/main.rs" }
   ]
 }
