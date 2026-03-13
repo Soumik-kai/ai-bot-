@@ -14,9 +14,14 @@ async fn main() -> anyhow::Result<()> {
     let cfg = config::Config::from_env()?;
     let state = config::AppState::new(&cfg).await?;
 
-    let app = Router::new()
-        .route("/webhook", post(handlers::webhook_handler))
-        .with_state(state);
+    use axum::{routing::{get, post}, Router};
+
+let app = Router::new()
+    // Root route for health check
+    .route("/", get(|| async { "Bot is running ✅" }))
+    // Webhook route for Telegram
+    .route("/webhook", post(handlers::webhook_handler))
+    .with_state(state);
 
     let port: u16 = std::env::var("PORT").unwrap_or_else(|_| "3000".into()).parse().unwrap();
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
