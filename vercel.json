@@ -1,0 +1,1 @@
+{ "version": 2, "builds": [ { "src": "Tg-ai-bot-rust/src/main.rs", "use": "@vercel/rust" } ], "routes": [ { "src": "/.*", "dest": "/Tg-ai-bot-rust/src/main.rs" } ] }
