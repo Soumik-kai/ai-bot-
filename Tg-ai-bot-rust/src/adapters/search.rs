@@ -15,11 +15,8 @@ pub trait SearchAdapter: Send + Sync {
     async fn search(&self, query: &str) -> Result<Vec<SearchResult>>;
 }
 
-/// Implementation using Bing Web Search (skeleton).
-/// Replace HTTP calls with real provider endpoints and rotate keys.
 pub struct SearchAdapterImpl {
     http: Client,
-    // keys and rotation state would be loaded here
 }
 
 impl SearchAdapterImpl {
@@ -28,17 +25,52 @@ impl SearchAdapterImpl {
     }
 }
 
+#[derive(Debug, Deserialize)]
+struct DuckDuckGoResponse {
+    #[serde(rename = "AbstractText")]
+    abstract_text: String,
+    #[serde(rename = "AbstractURL")]
+    abstract_url: String,
+    #[serde(rename = "Heading")]
+    heading: String,
+    #[serde(rename = "RelatedTopics")]
+    related: Option<Vec<RelatedTopic>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RelatedTopic {
+    #[serde(rename = "Text")]
+    text: String,
+    #[serde(rename = "FirstURL")]
+    url: String,
+}
+
 #[async_trait]
 impl SearchAdapter for SearchAdapterImpl {
     async fn search(&self, query: &str) -> Result<Vec<SearchResult>> {
-        // TODO: implement real Bing/Google search with key rotation and caching.
-        // Placeholder: return a synthetic result to ensure flow works.
-        Ok(vec![
-            SearchResult {
-                title: "Example news result".into(),
-                snippet: format!("Top snippet for query: {}", query),
-                url: "https://example.com/article".into(),
+        let url = format!("https://api.duckduckgo.com/?q={}&format=json", query);
+        let resp = self.http.get(&url).send().await?.json::<DuckDuckGoResponse>().await?;
+
+        let mut results = Vec::new();
+
+        if !resp.abstract_text.is_empty() {
+            results.push(SearchResult {
+                title: resp.heading.clone(),
+                snippet: resp.abstract_text.clone(),
+                url: resp.abstract_url.clone(),
+            });
+        }
+
+        if let Some(related) = resp.related {
+            for r in related.iter().take(5) {
+                results.push(SearchResult {
+                    title: r.text.clone(),
+                    snippet: r.text.clone(),
+                    url: r.url.clone(),
+                });
             }
-        ])
+        }
+
+        Ok(results)
     }
 }
